@@ -59,8 +59,21 @@ class UpdateAccountSerializer(serializers.ModelSerializer):
         return instance
 
 
+class UserLoginSerializer(serializers.ModelSerializer):
+    username = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
 
+    class Meta:
+        model = Account
+        fields = ("username", "password")
+        extra_kwargs = {"password": {"write_only": True}}
 
-
-
-
+    def validate(self, data):
+        username = data["username"]
+        password = data["password"]
+        user = Account.objects.get(username=username)
+        if user:
+            if not user.check_password(data["password"]):
+                raise serializers.ValidationError("Incoreect Password")
+            return data
+        raise serializers.ValidationError("User Not Found")

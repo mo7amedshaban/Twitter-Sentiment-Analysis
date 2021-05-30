@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import ChangePasswordSerializer
 from rest_framework import generics
 
-from account.serializers import AccountSerializer, UpdateAccountSerializer
+from account.serializers import AccountSerializer, UpdateAccountSerializer, UserLoginSerializer
 
 from rest_framework import status
 from .models import Account
@@ -26,6 +26,26 @@ def registration_api(request):
             data['username'] = account.username
             token = Token.objects.get(user=account).key
             data['token'] = token
+        else:
+            data = serializer.errors
+        return Response(data)
+
+
+@api_view(['POST', ])
+@permission_classes([~IsAuthenticated])
+def login_api(request):
+    if request.method == 'POST':
+        serializer = UserLoginSerializer(data=request.data)
+        data = {}
+        if serializer.is_valid():
+            # account = serializer.save()
+            # data['response'] = 'successfully registered new user.'
+            # data['email'] = account.email
+            # data['username'] = account.username
+            # token = Token.objects.get(user=account).key
+            # data['token'] = token
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
         else:
             data = serializer.errors
         return Response(data)
