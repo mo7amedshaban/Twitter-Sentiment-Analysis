@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import ChangePasswordSerializer
 from rest_framework import generics
 
-from account.serializers import AccountSerializer
+from account.serializers import AccountSerializer, UpdateAccountSerializer
 
 from rest_framework import status
 from .models import Account
@@ -44,21 +44,36 @@ def account_view(request):
         return Response(serializer.data)
 
 
-@api_view(['PUT', ])
-# @permission_classes([IsAuthenticated])
-def update_account_view(request):
-    try:
-        account = request.user
-    except Account.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    if request.method == 'PUT':
-        serializer = AccountSerializer(account, data=request.data)
-        data = {}
-        if serializer.is_valid():
-            serializer.save()
-            data['response'] = 'Account update success'
-            return Response(data=data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# @api_view(['PUT', ])
+# @permission_classes((IsAuthenticated,))
+# def update_account_view(request):
+#     try:
+#         account = request.user
+#     except Account.DoesNotExist:
+#         return Response(status=status.HTTP_404_NOT_FOUND)
+#     if request.method == 'PUT':
+#         serializer = AccountSerializer(account, data=request.data)
+#         data = {}
+#         if serializer.is_valid():
+#             serializer.save()
+#             data['response'] = 'Account update success'
+
+#             return Response(data=data)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class AccountRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = UpdateAccountSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        serializer = self.serializer_class(request.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def update(self, request, *args, **kwargs):
+        serializer = self.serializer_class(request.user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ChangePasswordView(generics.UpdateAPIView):

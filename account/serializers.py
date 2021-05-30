@@ -1,3 +1,5 @@
+from rest_framework import status
+from rest_framework.response import Response
 from rest_framework import serializers
 from account.models import Account
 
@@ -34,3 +36,31 @@ class AccountSerializer(serializers.ModelSerializer):
         account.set_password(password)  # set_password object from Account
         account.save()  # save object from Account
         return account
+
+
+class UpdateAccountSerializer(serializers.ModelSerializer):
+    # add field
+    password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
+
+    class Meta:
+        model = Account  # not have password2 in AbstractBaseUser
+        fields = ['email', 'username', 'password', 'password2', 'id', 'image', 'phone', 'age']
+        extra_kwargs = {
+            'password': {'write_only': True}  # password not appear in json responcse
+        }
+
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            if attr == 'password':
+                instance.set_password(value)
+            else:
+                setattr(instance, attr, value)
+        instance.save()
+        return instance
+
+
+
+
+
+
+
