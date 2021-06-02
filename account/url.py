@@ -2,7 +2,7 @@ from rest_framework.authtoken.views import obtain_auth_token
 
 from django.urls import path, include
 # from django.conf.urls import url
-from .views import ChangePasswordView, AccountRetrieveUpdateAPIView
+from .views import ChangePasswordView
 
 from account import views
 
@@ -16,7 +16,7 @@ urlpatterns = [
     # url(r'^/password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
     path('change-password', ChangePasswordView.as_view(), name='change-password'),
     path('account_view', views.account_view),
-    # path('update_account_view', views.update_account_view),
-    path('update_account_view', AccountRetrieveUpdateAPIView.as_view()),
+    path('update_account_view', views.update_account_view),
+    # path('update_account_view', AccountRetrieveUpdateAPIView.as_view()),
 
 ]

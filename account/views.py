@@ -36,19 +36,10 @@ def registration_api(request):
 def login_api(request):
     if request.method == 'POST':
         serializer = UserLoginSerializer(data=request.data)
-        data = {}
         if serializer.is_valid():
-            # account = serializer.save()
-            # data['response'] = 'successfully registered new user.'
-            # data['email'] = account.email
-            # data['username'] = account.username
-            # token = Token.objects.get(user=account).key
-            # data['token'] = token
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
-
-        else:
-            data = serializer.errors
-        return Response(data)
+    return Response(serializer.errors)
 
 
 @api_view(['GET', ])
@@ -64,36 +55,36 @@ def account_view(request):
         return Response(serializer.data)
 
 
-# @api_view(['PUT', ])
-# @permission_classes((IsAuthenticated,))
-# def update_account_view(request):
-#     try:
-#         account = request.user
-#     except Account.DoesNotExist:
-#         return Response(status=status.HTTP_404_NOT_FOUND)
-#     if request.method == 'PUT':
-#         serializer = AccountSerializer(account, data=request.data)
-#         data = {}
-#         if serializer.is_valid():
-#             serializer.save()
-#             data['response'] = 'Account update success'
+@api_view(['PUT', ])
+@permission_classes((IsAuthenticated,))
+def update_account_view(request):
+    try:
+        account = request.user
+    except Account.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    if request.method == 'PUT':
+        serializer = UpdateAccountSerializer(account, data=request.data)
+        data = {}
+        if serializer.is_valid():
+            serializer.save()
+            data['response'] = 'Account update success'
 
-#             return Response(data=data)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data=data)
+        return Response(serializer.errors)
 
-class AccountRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
-    permission_classes = (IsAuthenticated,)
-    serializer_class = UpdateAccountSerializer
-
-    def retrieve(self, request, *args, **kwargs):
-        serializer = self.serializer_class(request.user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def update(self, request, *args, **kwargs):
-        serializer = self.serializer_class(request.user, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
+# class AccountRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
+#     permission_classes = (IsAuthenticated,)
+#     serializer_class = UpdateAccountSerializer
+#
+#     def retrieve(self, request, *args, **kwargs):
+#         serializer = self.serializer_class(request.user)
+#         return Response(serializer.data, status=status.HTTP_200_OK)
+#
+#     def update(self, request, *args, **kwargs):
+#         serializer = self.serializer_class(request.user, data=request.data, partial=True)
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ChangePasswordView(generics.UpdateAPIView):
@@ -116,7 +107,7 @@ class ChangePasswordView(generics.UpdateAPIView):
         if serializer.is_valid():
             # Check old password
             if not self.object.check_password(serializer.data.get("old_password")):
-                return Response({"old_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"old_password": ["Wrong password."]})
             # set_password also hashes the password that the user will get
             self.object.set_password(serializer.data.get("new_password"))
             self.object.save()
@@ -129,4 +120,4 @@ class ChangePasswordView(generics.UpdateAPIView):
 
             return Response(response)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors)

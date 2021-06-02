@@ -2,6 +2,11 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework import serializers
 from account.models import Account
+from rest_framework.validators import UniqueValidator
+
+import sys
+from django.core import exceptions
+import django.contrib.auth.password_validation as validators
 
 
 class ChangePasswordSerializer(serializers.Serializer):
@@ -40,40 +45,45 @@ class AccountSerializer(serializers.ModelSerializer):
 
 class UpdateAccountSerializer(serializers.ModelSerializer):
     # add field
-    password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
+    # password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
 
     class Meta:
         model = Account  # not have password2 in AbstractBaseUser
-        fields = ['email', 'username', 'password', 'password2', 'id', 'image', 'phone', 'age']
-        extra_kwargs = {
-            'password': {'write_only': True}  # password not appear in json responcse
-        }
+        fields = ['email', 'username', 'id', 'image', 'phone', 'age']
+        # extra_kwargs = {
+        #     'password': {'write_only': True}  # password not appear in json responcse
+        # }
 
-    def update(self, instance, validated_data):
-        for attr, value in validated_data.items():
-            if attr == 'password':
-                instance.set_password(value)
-            else:
-                setattr(instance, attr, value)
-        instance.save()
-        return instance
+    # def update(self, instance, validated_data):
+    #     for attr, value in validated_data.items():
+    #         if attr == 'password':
+    #             instance.set_password(value)
+    #         else:
+    #             setattr(instance, attr, value)
+    #     instance.save()
+    #     return instance
 
 
 class UserLoginSerializer(serializers.ModelSerializer):
-    username = serializers.EmailField()
-    password = serializers.CharField(write_only=True)
-
     class Meta:
         model = Account
         fields = ("username", "password")
         extra_kwargs = {"password": {"write_only": True}}
 
-    def validate(self, data):
-        username = data["username"]
-        password = data["password"]
-        user = Account.objects.get(username=username)
-        if user:
-            if not user.check_password(data["password"]):
-                raise serializers.ValidationError("Incoreect Password")
-            return data
-        raise serializers.ValidationError("User Not Found")
+    def validate_username(self, value):
+        user = Account.objects.filter(email=value)
+        if not user:
+            raise serializers.ValidationError("Wrong Email !!")
+        return value
+
+    def validate_password(self, value):
+        user = Account.objects.filter(password=value)
+        if not user:
+            raise serializers.ValidationError("Wrong password !!")
+        return value
+
+    # try:
+    #     validators.validate_password(value)
+    # except exceptions.ValidationError as exc:
+    #     raise serializers.ValidationError(str(exc))
+    # return value
