@@ -10,8 +10,8 @@ app_name = 'account'
 urlpatterns = [
     path('register', views.registration_api),
     # django rest api add default obtain_auth_toke for login
-    path('login', views.login_api),
-    # path('login', obtain_auth_token, name='api_token_auth'),  # <-- And here
+    # path('login', views.login_api),
+    path('login', obtain_auth_token, name='api_token_auth'),  # <-- And here
 
     # url(r'^/password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
     path('change-password', ChangePasswordView.as_view(), name='change-password'),

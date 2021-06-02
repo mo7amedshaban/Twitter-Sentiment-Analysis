@@ -36,10 +36,23 @@ def registration_api(request):
 def login_api(request):
     if request.method == 'POST':
         serializer = UserLoginSerializer(data=request.data)
+        data = {}
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-    return Response(serializer.errors)
+            account = serializer.save()
+            # data['response'] = 'successfully registered new user.'
+            # data['email'] = account.email
+            data['username'] = account.username
+            token = Token.objects.get(user=account).key
+            data['token'] = token
+        else:
+            data = serializer.errors
+        return Response(data)
+
+    #     serializer = UserLoginSerializer(data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(serializer.data, status=status.HTTP_200_OK)
+    # return Response(serializer.errors)
 
 
 @api_view(['GET', ])
@@ -71,6 +84,7 @@ def update_account_view(request):
 
             return Response(data=data)
         return Response(serializer.errors)
+
 
 # class AccountRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
 #     permission_classes = (IsAuthenticated,)
