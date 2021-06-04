@@ -7,6 +7,7 @@ from rest_framework.validators import UniqueValidator
 import sys
 from django.core import exceptions
 import django.contrib.auth.password_validation as validators
+from django.contrib.auth import password_validation
 
 
 class ChangePasswordSerializer(serializers.Serializer):
@@ -76,14 +77,15 @@ class UserLoginSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Wrong Email !!")
         return value
 
-    def validate_password(self, value):
-        user = Account.objects.filter(password=value)
-        if not user:
-            raise serializers.ValidationError("Wrong password !!")
-        return value
+    # def validate_password(self, value):
+    #     user = Account.objects.filter(password=value)
+    #     if user:
+    #         return value
+    #     raise serializers.ValidationError("Wrong password !!")
 
-    # try:
-    #     validators.validate_password(value)
-    # except exceptions.ValidationError as exc:
-    #     raise serializers.ValidationError(str(exc))
-    # return value
+    # def validate_password(self, value):
+    #     try:
+    #         validators.validate_password(value)
+    #     except exceptions.ValidationError as exc:
+    #         raise serializers.ValidationError(str(exc))
+    #     return value

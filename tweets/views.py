@@ -59,17 +59,21 @@ def analyze(Topic):
 @api_view(['POST', ])
 @permission_classes([IsAuthenticated])
 def get_tweets(request):
-    topic = request.POST['topic']
-    positive, negative, all_tweets = analyze(topic)
-    data = {}
+    try:
+        topic = request.POST['topic']
+        if not topic:
+            return Response({"Please write any word for return tweets"})
+        positive, negative, all_tweets = analyze(topic)
+        data = {}
+        data['negative_count'] = len(negative)
+        data['positive_count'] = len(positive)
+        data["positive"] = positive
+        data["negative"] = negative
+        data['all_tweets'] = all_tweets
 
-    data['negative_count'] = len(negative)
-    data['positive_count'] = len(positive)
-    data["positive"] = positive
-    data["negative"] = negative
-    data['all_tweets'] = all_tweets
-
-    return Response(data)
+        return Response(data)
+    except:
+        return Response({"error"})
 
 # @api_view(['GET', ])
 # @permission_classes([IsAuthenticated])
