@@ -38,10 +38,8 @@ def login_api(request):
         serializer = UserLoginSerializer(data=request.data)
         data = {}
         if serializer.is_valid():
-            account = serializer.save()
-            # data['response'] = 'successfully registered new user.'
-            # data['email'] = account.email
-            data['username'] = account.username
+            account = Account.objects.get(email=request.data["username"])
+
             token = Token.objects.get(user=account).key
             data['token'] = token
         else:

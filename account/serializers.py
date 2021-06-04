@@ -85,7 +85,11 @@ class UserLoginSerializer(serializers.ModelSerializer):
 
     # def validate_password(self, value):
     #     try:
-    #         validators.validate_password(value)
+    #         password_check = validators.validate_password(value)
+    #         user = Account.objects.filter(password=password_check)
+    #         if user:
+    #             return Response({"exist login done :)"})
+    #
     #     except exceptions.ValidationError as exc:
     #         raise serializers.ValidationError(str(exc))
     #     return value
