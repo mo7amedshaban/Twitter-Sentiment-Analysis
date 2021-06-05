@@ -77,19 +77,12 @@ class UserLoginSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Wrong Email !!")
         return value
 
-    # def validate_password(self, value):
-    #     user = Account.objects.filter(password=value)
-    #     if user:
-    #         return value
-    #     raise serializers.ValidationError("Wrong password !!")
-
-    # def validate_password(self, value):
-    #     try:
-    #         password_check = validators.validate_password(value)
-    #         user = Account.objects.filter(password=password_check)
-    #         if user:
-    #             return Response({"exist login done :)"})
-    #
-    #     except exceptions.ValidationError as exc:
-    #         raise serializers.ValidationError(str(exc))
-    #     return value
+    def validate(self, data):
+        email = data["username"]
+        password = data["password"]
+        user = Account.objects.get(email=email)
+        if user:
+            if not user.check_password(data["password"]):
+                raise serializers.ValidationError("Incoreect Password")
+            return data
+        raise serializers.ValidationError("User Not Found")
