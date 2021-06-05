@@ -81,7 +81,7 @@ def update_account_view(request):
         serializer = UpdateAccountSerializer(account, data=request.data)
         data = {}
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(image=request.data.get('image'))
             data['response'] = 'Account update success'
 
             return Response(data=data)

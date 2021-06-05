@@ -51,9 +51,19 @@ class UpdateAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account  # not have password2 in AbstractBaseUser
         fields = ['email', 'username', 'id', 'image', 'phone', 'age']
+
         # extra_kwargs = {
         #     'password': {'write_only': True}  # password not appear in json responcse
         # }
+        # def get_image_url(self, listing):
+        #     return listing.photo.url
+
+            # def get_profile_image_filepath(self, filename):  # media_cdn
+    #     return 'profile_images/' + str(self.pk) + '/profile_image.png'
+    #     # ------->  self.pk  ==> user number or id of user <-------------
+    #
+    # def get_default_profile_image():  # media_cdn
+    #     return "default_image/logo_1080_1080.png"
 
     # def update(self, instance, validated_data):
     #     for attr, value in validated_data.items():
