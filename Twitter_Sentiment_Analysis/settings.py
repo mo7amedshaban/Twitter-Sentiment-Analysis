@@ -48,18 +48,16 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
 
-
-
     # 'django_rest_passwordreset',
 
 ]
-
 
 # -----------> Add it <------------------
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # During development only
 AUTH_USER_MODEL = 'account.Account'  # app + model
 REST_FRAMEWORK = {
+
     # for token
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
@@ -71,6 +69,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    # 'DEFAULT_PARSER_CLASSES': [
+    #     'rest_framework.parsers.JSONParser',
+    # ],
     # for pagination
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 1  # can edit it
@@ -93,8 +94,6 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:8000"
 ]
-
-
 
 ROOT_URLCONF = 'Twitter_Sentiment_Analysis.urls'
 
